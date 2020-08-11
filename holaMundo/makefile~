@@ -1,0 +1,12 @@
+PORT=
+NOMBREARCHIVO=main
+default :clean
+
+compile:
+
+upload :
+
+clean:
+    rm $(NOMBREARCHIVO).o
+    rm $(NOMBREARCHIVO).hex
+    rm $(NOMBREARCHIVO).elf
