@@ -5,16 +5,18 @@ PORT	   = /dev/ttyS0
 BAUD       = 19200
 FILENAME   = main
 COMPILE    = avr-g++ -Wall  -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
-PINMODEDIR   =/home/dgc7/ejersiciosLibros/avr/UART/pinMode/pinMode
+PINMODEDIR   =./pinMode/pinMode
 PINMODE      =pinMode
-INCLUDE_PATH =/home/dgc7/ejersiciosLibros/avr/UART/pinMode/
-UART		 =/home/dgc7/ejersiciosLibros/avr/UART/UART/UART
+INCLUDE_PATH =./UART/pinMode/
+UART		 =./UART/UART
+SPI			 =./SPI/spi
 all:   build upload 
 build:
+	$(COMPILE) -c  $(SPI).cpp
 	$(COMPILE) -c  $(UART).cpp
 	$(COMPILE) -c  $(FILENAME).cpp 
 	$(COMPILE) -c  $(PINMODEDIR).cpp
-	$(COMPILE) -o  $(FILENAME).elf $(FILENAME).o $(PINMODE).o UART.o
+	$(COMPILE) -o  $(FILENAME).elf $(FILENAME).o $(PINMODE).o UART.o spi.o
 	avr-objcopy -j .text -j .data -O ihex $(FILENAME).elf $(FILENAME).hex
 	avr-size --format=avr --mcu=$(DEVICE) $(FILENAME).elf
 
