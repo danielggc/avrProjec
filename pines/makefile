@@ -5,7 +5,7 @@ PORT	   = /dev/ttyS0
 BAUD       = 19200
 FILENAME   = main
 COMPILE    = avr-g++ -Wall  -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
-PINMODEDIR   =/home/dgc7/ejersiciosLibros/avr/pines/pinMode/pinMode
+PINMODEDIR   =./pinMode/pinMode
 PINMODE      =pinMode
 INCLUDE_PATH =/home/dgc7/ejersiciosLibros/avr/pines/pinMode/
 all:   build upload 

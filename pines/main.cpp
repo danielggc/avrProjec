@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
-#include"/home/dgc7/ejersiciosLibros/avr/pines/pinMode/pinMode.hpp"
+#include "pinMode/pinMode.hpp"
 int main(){
     //~PINB & (1<<PORTB6
     PinConfiguration dd('B');

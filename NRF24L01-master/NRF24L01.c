@@ -4,7 +4,8 @@
 //  ||                      nrf_init					   ||
 //  =========================================================
 void nrf_init()
-{
+{	
+	initSPI();
 	// Enable outputs	
 	NRF_DDR |= (1 << NRF_CSN) | (1 << NRF_CE);
 
@@ -178,7 +179,8 @@ void nrf_flushRX( void )
 void nrf_getData( uint8_t *buffer, uint8_t size )
 {
 	NRF_CSN_LOW();
-	SPI_WRITE( R_RX_PAYLOAD );
+	
+( R_RX_PAYLOAD );
 	for ( int i = 0; i < size; i++ )
 		buffer[i] = SPI_WRITE( R_RX_PAYLOAD );
 	NRF_CSN_HIGH();
