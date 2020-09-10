@@ -1,7 +1,7 @@
 DEVICE     = atmega2560
 CLOCK      = 8000000
 PROGRAMMER = stk500v2
-PORT	   = /dev/ttyUSB2
+PORT	   = /dev/ttyUSB0
 BAUD       = 115200
 FILENAME   = main
 COMPILE    = avr-g++ -Wall  -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)

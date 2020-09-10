@@ -1,4 +1,6 @@
 
+#ifndef UART_HEADER
+#define UART_HEADER
 #include"../pinMode/PIN.hpp"
 #include <util/delay.h>
 #include <stdlib.h>
@@ -13,3 +15,4 @@ class UART{
         void UART_write_txt(char *);
         void USART_Uint8_tWrite(uint8_t);
 };
+#endif

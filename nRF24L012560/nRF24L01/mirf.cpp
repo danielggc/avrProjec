@@ -1,75 +1,67 @@
 #include "nRF24L01.hpp"
 #include "mirf.hpp"
 
-uint8_t payload_len;
 
-void nrf24_init(){
-	spi_init();
-	mirf_CE_lo;
-    _delay_us(10);    
-    mirf_CSN_hi;    
+Nrf24::Nrf24(){
+    UART pantalla1;
+    pantalla1.uart_init();
+    SPI comunicacion;
+    comunicacion.SPI_Init(Master);
+}
+void Nrf24::nrf24_init(){
+    DDRH |= ((1<<CSN)|(1<<CE));
+    mirf_CE_hi;
+    mirf_CSN_lo;
+    
 }
 
-void nrf24_config(uint8_t channel, uint8_t pay_length)
-{
-    payload_len = pay_length;
+void Nrf24::nrf24_config(){
 
-    nrf24_configRegister(RF_CH,channel);
+    _delay_us(1000);
+    nrf24_configRegister(EN_AA, 0x01);      
 
-    nrf24_configRegister(RX_PW_P0, 0x00); 
-    nrf24_configRegister(RX_PW_P1, payload_len); 
-    nrf24_configRegister(RX_PW_P2, 0x00);  
-    nrf24_configRegister(RX_PW_P3, 0x00); 
-    nrf24_configRegister(RX_PW_P4, 0x00); 
-    nrf24_configRegister(RX_PW_P5, 0x00); 
-
-    nrf24_configRegister(RF_SETUP, (0<<RF_DR)|((0x03)<<RF_PWR));
-
-    nrf24_configRegister(CONFIG,nrf24_CONFIG);
-
-    nrf24_configRegister(EN_AA,(1<<ENAA_P0)|(1<<ENAA_P1)|(0<<ENAA_P2)|(0<<ENAA_P3)|(0<<ENAA_P4)|(0<<ENAA_P5));
-
-    nrf24_configRegister(EN_RXADDR,(1<<ERX_P0)|(1<<ERX_P1)|(0<<ERX_P2)|(0<<ERX_P3)|(0<<ERX_P4)|(0<<ERX_P5));
-
-    nrf24_configRegister(SETUP_RETR,(0x04<<ARD)|(0x0F<<ARC));
-
-    nrf24_configRegister(DYNPD,(0<<DPL_P0)|(0<<DPL_P1)|(0<<DPL_P2)|(0<<DPL_P3)|(0<<DPL_P4)|(0<<DPL_P5));
-
+    _delay_us(10);
+    nrf24_configRegister(SETUP_RETR, 0x2F); 
+    _delay_us(10);
+    nrf24_configRegister(EN_RXADDR, 0x01);  
+    _delay_us(10);
+    nrf24_configRegister(SETUP_AW, 0x03);   
+    _delay_us(10);
+    nrf24_configRegister(RF_CH, 0x01);      
+    _delay_us(10);
+    nrf24_configRegister(RF_SETUP, 0x07); 
+    _delay_us(10);
+    nrf24_configRegister(RX_PW_P0, mirf_PAYLOAD);
+    _delay_us(10);
     nrf24_powerUpRx();
 }
 
-void nrf24_rx_address(uint8_t * adr) 
-{
+void Nrf24::nrf24_rx_address(uint8_t * adr) {
 	mirf_CE_lo
     nrf24_writeRegister(RX_ADDR_P1,adr,nrf24_ADDR_LEN);
   	mirf_CE_hi
 }
 
-uint8_t nrf24_payload_length()
-{
-    return payload_len;
+uint8_t  Nrf24::nrf24_payload_length(){
+    return  mirf_PAYLOAD;
 }
 
-void nrf24_tx_address(uint8_t* adr)
-{
+void Nrf24::nrf24_tx_address(uint8_t* adr){
     nrf24_writeRegister(RX_ADDR_P0,adr,nrf24_ADDR_LEN);
     nrf24_writeRegister(TX_ADDR,adr,nrf24_ADDR_LEN);
 }
 
-uint8_t nrf24_dataReady() 
-{
+uint8_t  Nrf24::nrf24_dataReady() {
     uint8_t status = nrf24_getStatus();
 
-    if ( status & (1 << RX_DR) ) 
-    {
+    if ( status & (1 << RX_DR) ){
         return 1;
     }
 
     return !nrf24_rxFifoEmpty();;
 }
 
-uint8_t nrf24_rxFifoEmpty()
-{
+uint8_t  Nrf24::nrf24_rxFifoEmpty(){
     uint8_t fifoStatus;
 
     nrf24_readRegister(FIFO_STATUS,&fifoStatus,1);
@@ -77,26 +69,24 @@ uint8_t nrf24_rxFifoEmpty()
     return (fifoStatus & (1 << RX_EMPTY));
 }
 
-uint8_t nrf24_payloadLength()
-{
+uint8_t  Nrf24::nrf24_payloadLength(){
     uint8_t status;
    	mirf_CSN_lo 
     _delay_us(10);
-    spi_fast_shift(R_RX_PL_WID);
-    status = spi_fast_shift(0x00);
+    comunicacion.SPI_uint8_tTransmit(R_RX_PL_WID);
+    status = comunicacion.SPI_uint8_tTransmit(0x00);
     _delay_us(10);    
     mirf_CSN_hi;
     return status;
 }
 
-void nrf24_getData(uint8_t* data) 
-{
+void Nrf24::nrf24_getData(uint8_t* data){
    	mirf_CSN_lo 
     _delay_us(10);                               
 
-    spi_fast_shift( R_RX_PAYLOAD );
+    comunicacion.SPI_uint8_tTransmit( R_RX_PAYLOAD );
     
-    nrf24_transferSync(data,data,payload_len);
+    nrf24_transferSync(data,data,mirf_PAYLOAD);
     
     _delay_us(10);    
     mirf_CSN_hi;
@@ -104,8 +94,7 @@ void nrf24_getData(uint8_t* data)
     nrf24_configRegister(STATUS,(1<<RX_DR));   
 }
 
-uint8_t nrf24_retransmissionCount()
-{
+uint8_t  Nrf24::nrf24_retransmissionCount(){
     uint8_t rv;
     nrf24_readRegister(OBSERVE_TX,&rv,1);
     rv = rv & 0x0F;
@@ -113,8 +102,7 @@ uint8_t nrf24_retransmissionCount()
 }
 
 
-void nrf24_send(uint8_t* value) 
-{    
+void Nrf24::nrf24_send(uint8_t* value) {    
 		mirf_CE_lo
      
     nrf24_powerUpTx();
@@ -123,7 +111,7 @@ void nrf24_send(uint8_t* value)
        	mirf_CSN_lo 
         _delay_us(10);           
 
-        spi_fast_shift(FLUSH_TX);     
+        comunicacion.SPI_uint8_tTransmit(FLUSH_TX);     
 
     _delay_us(10);        
         mirf_CSN_hi;                    
@@ -132,9 +120,9 @@ void nrf24_send(uint8_t* value)
    	mirf_CSN_lo 
     _delay_us(10);
 
-    spi_fast_shift(W_TX_PAYLOAD);
+    comunicacion.SPI_uint8_tTransmit(W_TX_PAYLOAD);
 
-    nrf24_transmitSync(value,payload_len);   
+    nrf24_transmitSync(value,mirf_PAYLOAD);   
 
     _delay_us(10);    
     mirf_CSN_hi;
@@ -142,14 +130,12 @@ void nrf24_send(uint8_t* value)
   	mirf_CE_hi    
 }
 
-uint8_t nrf24_isSending()
-{
+uint8_t  Nrf24::nrf24_isSending(){
     uint8_t status;
 
     status = nrf24_getStatus();
                 
-    if((status & ((1 << TX_DS)  | (1 << MAX_RT))))
-    {        
+    if((status & ((1 << TX_DS)  | (1 << MAX_RT)))){        
         return 0;
     }
 
@@ -157,42 +143,36 @@ uint8_t nrf24_isSending()
 
 }
 
-uint8_t nrf24_getStatus()
-{
+uint8_t  Nrf24::nrf24_getStatus(){
     uint8_t rv;
    	mirf_CSN_lo 
     _delay_us(10);
-    rv = spi_fast_shift(NOP);
+    rv = comunicacion.SPI_uint8_tTransmit(NOP);
     _delay_us(10);    
     mirf_CSN_hi;
     return rv;
 }
 
-uint8_t nrf24_lastMessageStatus()
-{
+uint8_t   Nrf24::nrf24_lastMessageStatus(){
     uint8_t rv;
 
     rv = nrf24_getStatus();
 
-    if((rv & ((1 << TX_DS))))
-    {
+    if((rv & ((1 << TX_DS)))){
         return NRF24_TRANSMISSON_OK;
     }
-    else if((rv & ((1 << MAX_RT))))
-    {
+    else if((rv & ((1 << MAX_RT)))){
         return NRF24_MESSAGE_LOST;
     }  
-    else
-    {
+    else{
         return 0xFF;
     }
 }
 
-void nrf24_powerUpRx()
-{     
+void Nrf24::nrf24_powerUpRx(){     
    	mirf_CSN_lo 
     _delay_us(10);
-    spi_fast_shift(FLUSH_RX);
+    comunicacion.SPI_uint8_tTransmit(FLUSH_RX);
     _delay_us(10);    
     mirf_CSN_hi;
 
@@ -203,68 +183,66 @@ void nrf24_powerUpRx()
   	mirf_CE_hi
 }
 
-void nrf24_powerUpTx()
-{
+void Nrf24::nrf24_powerUpTx(){
     nrf24_configRegister(STATUS,(1<<RX_DR)|(1<<TX_DS)|(1<<MAX_RT)); 
 
     nrf24_configRegister(CONFIG,nrf24_CONFIG|((1<<PWR_UP)|(0<<PRIM_RX)));
 }
 
-void nrf24_powerDown()
-{
+void Nrf24::nrf24_powerDown(){
 		mirf_CE_lo
     nrf24_configRegister(CONFIG,nrf24_CONFIG);
 }
 
 
 
-void nrf24_transferSync(uint8_t* dataout,uint8_t* datain,uint8_t len)
-{
+void Nrf24::nrf24_transferSync(uint8_t* dataout,uint8_t* datain,uint8_t len){
     uint8_t i;
 
-    for(i=0;i<len;i++)
-    {
-        datain[i] = spi_fast_shift(dataout[i]);
+    for(i=0;i<len;i++){
+        
+        datain[i] = comunicacion.SPI_uint8_tTransmit(dataout[i]);
+        
     }
 
 }
 
-void nrf24_transmitSync(uint8_t* dataout,uint8_t len)
-{
+void Nrf24::nrf24_transmitSync(uint8_t* dataout,uint8_t len){
     uint8_t i;
     
-    for(i=0;i<len;i++)
-    {
-        spi_fast_shift(dataout[i]);
+    for(i=0;i<len;i++){
+        comunicacion.SPI_uint8_tTransmit(dataout[i]);
     }
 
 }
 
-void nrf24_configRegister(uint8_t reg, uint8_t value)
-{
-   	mirf_CSN_lo 
+void Nrf24::nrf24_configRegister(uint8_t reg, uint8_t value){
+    mirf_CSN_lo 
     _delay_us(10);
-    spi_fast_shift(W_REGISTER | (REGISTER_MASK & reg));
-    spi_fast_shift(value);
+
+    
+    comunicacion.SPI_uint8_tTransmit(W_REGISTER | (REGISTER_MASK & reg));
+
+    _delay_us(1000);
+    comunicacion.SPI_uint8_tTransmit(value);
+
     _delay_us(10);    
     mirf_CSN_hi;
 }
 
-void nrf24_readRegister(uint8_t reg, uint8_t* value, uint8_t len)
-{
+void Nrf24::nrf24_readRegister(uint8_t reg, uint8_t* value, uint8_t len){
    	mirf_CSN_lo 
     _delay_us(10);
-    spi_fast_shift(R_REGISTER | (REGISTER_MASK & reg));
+    comunicacion.SPI_uint8_tTransmit(R_REGISTER | (REGISTER_MASK & reg));
     nrf24_transferSync(value,value,len);
     _delay_us(10);    
     mirf_CSN_hi;
 }
 
-void nrf24_writeRegister(uint8_t reg, uint8_t* value, uint8_t len) 
-{
+void Nrf24::nrf24_writeRegister(uint8_t reg, uint8_t* value, uint8_t len) {
    	mirf_CSN_lo 
     _delay_us(10);
-    spi_fast_shift(W_REGISTER | (REGISTER_MASK & reg));
+    comunicacion.SPI_uint8_tTransmit(W_REGISTER | (REGISTER_MASK & reg));
     nrf24_transmitSync(value,len);
     _delay_us(10);    
     mirf_CSN_hi;

@@ -1,5 +1,30 @@
 #include"PIN.hpp"
 
+
+void configAnalogPWM(){
+    DDRB |= (1<<PB4);
+    TCCR2A |= (1<<WGM21)|(1<<WGM20);
+    TCCR2A |= (1<<COM2A1)|(1<<COM2A0)|(0<<COM2B1)|(0<<COM2B0);
+    TCCR2B |= (0<<CS02)|(1<<CS00);
+}
+
+
+
+void adc_init()
+{
+    ADMUX = (1<<REFS0);
+    ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+}
+uint16_t adc_read(uint8_t ch){
+  ch &= 0b00000111; 
+  ADMUX = (ADMUX & 0xF8)|ch; 
+  ADCSRA |= (1<<ADSC);
+  while(ADCSRA & (1<<ADSC));
+  return (ADC);
+}
+
+
+
 PinConfiguration::PinConfiguration(char _portType){
     portType=_portType;
 }

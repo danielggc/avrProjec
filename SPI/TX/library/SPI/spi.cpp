@@ -1,26 +1,39 @@
 #include "spi.hpp"
- void SPI::SPI_Init(int dispositivo){
-   ConfiguracionsalidasMasterSPI;
-   MConfiguracionMISO;
-   SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
-   SPSR &= ~(1<<SPI2X);		
-   if(dispositivo==Master){
+#include "../UART/UART.hpp"
+#include <avr/interrupt.h>
 
+    //SPCR = (1<<SPE) | (1<<MSTR) | (1<<SPR0) ;
+      //PORTB |=(1<<MasterMISO);
+      //SPCR = ((1<<SPE)|(0<<SPIE)|(0<<DORD)|(1<<MSTR)|(0<<SPR1)|(1<<SPR0)|(0<<CPOL)|(0<<CPHA));    
       //SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
 	   //SPSR &= ~(1<<SPI2X);		
+void SPI::SPI_Init(int dispositivo){
+   if(dispositivo==Master){
+      ConfiguracionsalidasMasterSPI;
+      MConfiguracionMISO;
+      MConfiguracionSPCR;    
+      SPSR = (1<<SPI2X);   
    }
    else if(dispositivo==Slave){
       ConfiguracionSalidasSlaveSPI;
       SlaveConfiguracionMISO;
       SlaveConfiguracionSPCR;   
+      SPSR = (1<<SPI2X);   
    }
  }
 
-uint8_t SPI::SPI_uint8_tTransmit(uint8_t data)
-{
-    SPDR = data;
-    while((SPSR & (1<<SPIF))==0);
-    return SPDR;
+uint8_t SPI::SPI_uint8_tTransmit(uint8_t message){
+   UART pantalla1;
+   pantalla1.uart_init();
+   SPDR=message;
+   char flush_buffer;
+   int contador=0;
+   pantalla1.UART_write_txt("\nhola llegue al SPI_UINT8\n");
+   while((SPSR & (1<<SPIF))==0){
+  
+   };
+   flush_buffer=SPDR;
+    return flush_buffer;
 }
 
   void SPI::SPI_CaracterTransmit(char message){
@@ -28,14 +41,10 @@ uint8_t SPI::SPI_uint8_tTransmit(uint8_t data)
    SPDR = message;
    int contador = 0;
    bool validador = false;
-   while (validador == false){
-      if((SPDR & (1<<SPIF)))validador=true;
-      if(contador == 1000){
-         contador=0;
-         SPDR = message;
-      }
-      contador++;
+   while (SPSR & (1<<SPIF)==0){
+      /* code */
    }
+   
    flush_buffer = SPDR;
  }
 
@@ -50,70 +59,20 @@ uint8_t SPI::SPI_uint8_tTransmit(uint8_t data)
 
 
  uint8_t SPI::SPI_received(){
-   PinConfiguration SS('B');
-   SS.pinMode(INTPUT|pin2);
    SPDR= 0XFF;
    int contador=0;
    bool validador=false;
-   while (validador==false){
-      if((SPSR & (1<<SPIF)))validador=true;
-      if(contador==1000){
-         unsigned char borrar=SPDR;
-         contador=0;
-         SPDR= 0XFF;
-      }
-      contador++;
+   while( (SPSR & (1<<SPIF)==0) ){
+     
    }  
    return SPDR;
  }
+
 unsigned char SPI::SPI_receivedChar(){
     SPDR= 0XFF;
-    while(!(SPSR & (1<<SPIF)));
+    while((SPSR & (1<<SPIF)==0));
     return SPDR;
  }
 
 
 
-
-#define PORT_SPI    PORTB
-#define DDR_SPI     DDRB
-#define DD_MISO     DDB4
-#define DD_MOSI     DDB3
-#define DD_SS       DDB2
-#define DD_SCK      DDB5
-
-
-void spi_init(){
-   ConfiguracionsalidasMasterSPI;
-   MConfiguracionMISO;
-   SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
-	SPSR &= ~(1<<SPI2X);		
-
-}
-
-void spi_transfer_sync (uint8_t * dataout, uint8_t * datain, uint8_t len)
-// Shift full array through target device
-{
-       uint8_t i;      
-       for (i = 0; i < len; i++) {
-             SPDR = dataout[i];
-             while((SPSR & (1<<SPIF))==0);
-             datain[i] = SPDR;
-       }
-}
-
-void spi_transmit_sync (uint8_t * dataout, uint8_t len)
-// Shift full array to target device without receiving any byte
-{
-       uint8_t i;      
-       for (i = 0; i < len; i++) {
-             SPDR = dataout[i];
-             while((SPSR & (1<<SPIF))==0);
-       }
-}
-
-uint8_t spi_fast_shift (uint8_t data){
-   SPDR = data;
-    while(!(SPSR & (1<<SPIF)));
-    return SPDR;  
-}

@@ -34,4 +34,7 @@ class PinConfiguration{
     void diguitalWrite(unsigned int);
     int Pind(unsigned int);
 };
+void configAnalogPWM();
+void adc_init();
+uint16_t adc_read(uint8_t ch);
 #endif

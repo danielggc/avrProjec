@@ -5,6 +5,7 @@
 #include <avr/io.h> 
 #include <avr/interrupt.h>
 #include "../library/SPI/spi.hpp"
+#include "../library/UART/UART.hpp"
 
 #include <stdint.h>
 
@@ -24,13 +25,17 @@
 #define mirf_CE_hi      PORTB |=  (1<<CE);
 #define mirf_CE_lo      PORTB &= ~(1<<CE);
 
+
+
 #define mirf_CH 2
 #define mirf_PAYLOAD 16
 class Nrf24{
     private:
         SPI comunicacion ;
+        UART pantalla1;
     public:
         Nrf24();
+        void mirf_config_register(uint8_t reg, uint8_t value);
         void    nrf24_init();
         void    nrf24_rx_address(uint8_t* adr);
         void    nrf24_tx_address(uint8_t* adr);

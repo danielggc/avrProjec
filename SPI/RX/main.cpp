@@ -14,16 +14,17 @@ uint8_t data_array[4];
 uint8_t tx_address[5] = {0xD7,0xD7,0xD7,0xD7,0xD7};
 uint8_t rx_address[5] = {0xE7,0xE7,0xE7,0xE7,0xE7};
 int main(){
-    char mensaje=' ';
-    UART pantalla1;
-    pantalla1.uart_init();
-    nrf24_init();
-    nrf24_config(2,4);
-    while(1){    
-        uint8_t estado= nrf24_getStatus();
-        int_to_binario(estado);    
-        _delay_ms(1000);
+    UART pantalla;
+    pantalla.uart_init();
+    SPI comunicacion;
+    comunicacion.SPI_Init(Slave);
+    pantalla.UART_write_txt("empesemos");
+    while (1){
+        unsigned char mensague= comunicacion.SPI_received();
+        pantalla.USART0SendByte(mensague);
+        mensague=' ';
     }
+    
 }
 int int_to_binario(int8_t numero){
     UART pantalla1;

@@ -1,7 +1,7 @@
 DEVICE     = atmega328p
 CLOCK      = 8000000
 PROGRAMMER = arduino
-PORT	   = /dev/ttyACM0 
+PORT	   = /dev/ttyACM1
 BAUD       = 115200
 FILENAME   = main
 COMPILE    = avr-g++ -Wall  -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)

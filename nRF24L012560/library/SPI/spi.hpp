@@ -2,15 +2,14 @@
 #define SPI_HEADER
 
 #include "../pinMode/PIN.hpp"
-#include "../SPI/spi.hpp"
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define MasterMISO PORTB3 
+#define MasterMISO PORTB3
 #define MasterMOSI PORTB2
 #define MasterSCK  PORTB1
-#define MasterSS   PORTB0
+#define MasterSS   PORTB2
 //mosi sck ss salidas
 #define SleveMISO PORTB4 
 #define SleveMOSI PORTB3
@@ -20,18 +19,20 @@
 #define MasterSSHIGH (PORTB |= (1<<PB0))
 #define MasterSSLOW (PORTB &= ~(1<<PB0))
 
-#define ConfiguracionsalidasMasterSPI (DDRB |= (1<<PB1)|(1<<PB2)|(1<<PB0))
+#define ConfiguracionsalidasMasterSPI (DDRB |= (1<<PB2)|(1<<PB1)|(1<<PB0))
 // entrada miso
 #define MConfiguracionMISO (DDRB &= ~(1<<PB3))
-#define MConfiguracionSPCR (SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0))
+#define MConfiguracionSPCR (SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0)| (1<<SPIE) )
 #define MConfiguracionVelocidadTrasmicion (SPSR &= ~(1<<SPI2X))	
 ///slave
 #define ConfiguracionSalidasSlaveSPI (DDRB &= ~(1<<PB3)|(1<<PB2)|(1<<PB5))
 #define SlaveConfiguracionMISO (DDRB |= (1<<PB4))
-#define SlaveConfiguracionSPCR (SPCR =  (1<<SPE))
+#define SlaveConfiguracionSPCR (SPCR =  (1<<SPE) )
 
 #define Master 1
 #define Slave 0
+
+
 
 class SPI{
     public:
@@ -42,9 +43,8 @@ class SPI{
       uint8_t SPI_uint8_tTransmit(uint8_t);
       unsigned char SPI_receivedChar();
 
+
 };
-
-
 extern void spi_init();
 extern void spi_transfer_sync (uint8_t * dataout, uint8_t * datain, uint8_t len);
 extern void spi_transmit_sync (uint8_t * dataout, uint8_t len);
