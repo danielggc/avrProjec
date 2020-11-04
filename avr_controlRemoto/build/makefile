@@ -3,14 +3,14 @@ CLOCK      = 8000000
 PROGRAMMER = arduino
 PORT	   = /dev/ttyACM0 
 BAUD       = 115200
-FILENAME   = ../scr/main
+FILENAME   = ../src/main
 COMPILE    = avr-g++ -Wall  -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
-PIN 	   =../scr/library/pinMode/PIN
-UART	   =../scr/library/UART/UART
-SPI		   =../scr/library/SPI/spi
-TRANFORM_VAR =../scr/library/tranformVar/transformVar
-nRF24	   =../scr/nRF24L01/mirf
-Joystick = ../scr/joystick/joystick
+PIN 	   =../src/library/pinMode/PIN
+UART	   =../src/library/UART/UART
+SPI		   =../src/library/SPI/spi
+TRANFORM_VAR =../src/library/tranformVar/transformVar
+nRF24	   =../src/nRF24L01/mirf
+Joystick = ../src/joystick/joystick
 all:   build upload clean 
 build:
 
