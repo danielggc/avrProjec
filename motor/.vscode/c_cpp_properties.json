@@ -1,0 +1,30 @@
+{
+    "env": {
+      "defaultIncludePath": [ "${workspaceFolder}", "${workspaceFolder}/include" ],
+      "avrPath": "/usr/lib/",
+      "avrCompilerPath": "/usr/bin/avr-gcc"
+    },
+    "configurations": [
+      {
+        "name": "avr",
+        "intelliSenseMode": "gcc-x64",
+        "includePath": [
+            "${defaultIncludePath}"
+            , "${avrPath}/avr/include/"
+        ],
+        "macFrameworkPath": ["/System/Library/Frameworks"],
+        "defines": [
+            "_DEBUG"
+            , "UNICODE"
+            , "_UNICODE"
+        ],
+        "forcedInclude": ["${workspaceFolder}/include/config.h"],
+        "compilerPath": "${avrCompilerPath}",
+        "cStandard": "c11",
+        "cppStandard": "c++17"
+      }
+    ],
+    "version": 4
+  }
+  
+  

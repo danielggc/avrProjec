@@ -17,13 +17,10 @@ int char_to_int(char *direccionCaracter){
     UART pantalla1;   
     long numero=0;
     int contador=0;
-    pantalla1.USART0SendByte('\n');
     while (*direccionCaracter!=' '){
-        pantalla1.USART0SendByte(*direccionCaracter);
         direccionCaracter++;
         contador++;
     }
-    pantalla1.USART0SendByte('\n');
     direccionCaracter--;
     int multiplicador=10;
     for(int a=0;a<contador;a++){
@@ -37,15 +34,12 @@ int char_to_int(char *direccionCaracter){
         }
         direccionCaracter--;
     }
-    pantalla1.USART0SendByte('\n');
     char dato[6];
     char *direcciondato=&dato[0];
     int largo=numeroUnidades(numero);
     int_to_char(numero,direcciondato,largo);
     for(int d=0;d<largo;d++){
-        pantalla1.USART0SendByte(dato[d]);
     }
-    pantalla1.USART0SendByte('\n');
 
     return numero;
 

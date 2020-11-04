@@ -9,7 +9,8 @@ Nrf24::Nrf24(){
     comunicacion.SPI_Init(Master);
 }
 void Nrf24::nrf24_init(){
-    DDRB |= ((1<<CSN)|(1<<CE));
+    DDRB |= ((1<<CSN));
+    DDRD |=(1<<CE);
     mirf_CE_hi;
     mirf_CSN_lo;
     
