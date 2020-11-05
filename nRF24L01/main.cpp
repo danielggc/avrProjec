@@ -18,6 +18,8 @@ uint8_t q = 0;
 uint8_t data_array[]={'1','2','3','4',' ','  ',' ',' ',' ',' ',' ',' ',' '};
 uint8_t tx_address[5] = {0,0,0,0,1};
 uint8_t rx_address[5] = {0,0,0,0,1};
+
+
 int main(){
     DDRD |= (1<<PORTD2);
     for(int d=0;d<7;d++){

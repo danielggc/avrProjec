@@ -14,7 +14,6 @@ void UART::uart_init(){
 void UART::USART0SendByte(unsigned char caracter){
     while(!(UCSR0A&(1<<5)));
         UDR0 = caracter;
-    _delay_ms(10);
 }
 void UART::USART_Uint8_tWrite(uint8_t caracter){
     while(!(UCSR0A&(1<<5)));
@@ -34,13 +33,10 @@ uint8_t UART::USART0ReceiveByte(){
 }
 
 
-void UART::UART_WriteInt(long numero){
+void UART::UART_WriteInt(int numero){
     int largo=numeroUnidades(numero);
-    char numeroChar[largo++];
-    char *dirNumerochar=&numeroChar[0];
-    int_to_char(numero,dirNumerochar,largo);
-    numeroChar[largo++]=0x00;
-    dirNumerochar=&numeroChar[1];
-    UART_write_txt(dirNumerochar);
+    char buffer[largo+20];
+    itoa(numero,buffer,10);
+    UART_write_txt(buffer);
 
 }

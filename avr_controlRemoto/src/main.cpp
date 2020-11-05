@@ -13,26 +13,71 @@
 #include "library/pinMode/PIN.hpp"
 #include "library/tranformVar/transformVar.hpp"
 #include "joystick/joystick.hpp"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+using namespace std;
 
 int main(){ 
+    
     UART pantalla1;
     SPI iniciar;
-    joystick control;
-    
+    joystick control;  
     pantalla1.uart_init();
     adc_init();
     sei();
-    int datosZJoystick=10000;    
+    uint16_t datosZJoystick=0;    
     iniciar.SPI_Init(Master);
-    while (1){
-        datosZJoystick=control.datoZ();
+    uint16_t datosXJoystick=0;
+
+    int dato =52 ;
+    char buffer[33];
+    itoa(dato,buffer,10);
+    pantalla1.UART_write_txt(buffer);
+      while (1){
         if(control.validarEstadoZ()){
+            control.validarEstadoX();
+            pantalla1.UART_write_txt("   Y:");
+            datosZJoystick=control.cambioDatoZ;
             pantalla1.UART_WriteInt(datosZJoystick);
+            datosXJoystick =control.cambioDatoX;
+            pantalla1.UART_write_txt("   X:");
+            pantalla1.UART_WriteInt(datosXJoystick);
             pantalla1.USART0SendByte('\n');
         }
-        _delay_ms(100);
-        pantalla1.UART_write_txt("este es el eje X");
-        }
+    }
     
 
 }
+
+
+
+
+
+/*
+
+      datosZJoystick=control.cambioDatoZ;
+            datosXJoystick =control.cambioDatoX;
+            pantalla1.UART_WriteInt(datosZJoystick);
+            pantalla1.USART0SendByte(' ');
+            _delay_ms(50);
+            pantalla1.UART_WriteInt(datosXJoystick);
+            pantalla1.USART0SendByte('\n');
+            _delay_ms(50);
+
+
+
+            pantalla1.UART_write_txt("   Y:");
+            datosZJoystick=control.cambioDatoZ;
+            datosXJoystick =control.cambioDatoX;
+            itoa(datosZJoystick,buffer,10);
+            pantalla1.UART_write_txt(buffer);
+            pantalla1.UART_write_txt("   X:");
+            _delay_ms(50);
+            control.validarEstadoX();
+            itoa(datosXJoystick,buffer,10);
+            pantalla1.UART_write_txt(buffer);
+            pantalla1.USART0SendByte('\n');
+            _delay_ms(50);
+
+*/

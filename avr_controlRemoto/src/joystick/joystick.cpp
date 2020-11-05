@@ -13,6 +13,7 @@ joystick::joystick(){
 }
 
 bool joystick::validarEstadoX(){
+    cambioDatoX=adc_read(pinEjeX);
     if(cambioDatoX!=desplasamientoX){
         int diferencia=(cambioDatoX-desplasamientoX);
         if(diferencia<9)diferencia=diferencia*-1;
@@ -30,6 +31,7 @@ bool joystick::validarEstadoX(){
     }
 }
 bool joystick::validarEstadoZ(){
+    cambioDatoZ=adc_read(pinEjeZ);
     if(cambioDatoZ!=desplasamientoZ){
         float diferencia (cambioDatoZ-desplasamientoZ);
         if(diferencia<9)diferencia=diferencia*-1;
@@ -47,6 +49,7 @@ bool joystick::validarEstadoZ(){
     }
 }
 bool joystick::validarEstadoY(){
+   cambioDatoY=adc_read(pinEjeY);
    if(cambioDatoY!=desplasamientoY){
         int diferencia=(cambioDatoY-desplasamientoY);
         if(diferencia<9)diferencia=diferencia*-1;
@@ -62,20 +65,6 @@ bool joystick::validarEstadoY(){
     {
         return false;
     }
-}
-
-
-int joystick::datoX(){
-    cambioDatoX=adc_read(pinEjeX);
-    return cambioDatoX;
-}
-int joystick::datoZ(){
-    cambioDatoZ=adc_read(pinEjeZ);
-    return cambioDatoZ;
-}
-int joystick::datoY(){
-    cambioDatoY=adc_read(pinEjeY);
-    return cambioDatoY;
 }
 
 
@@ -97,6 +86,26 @@ int joystick::datoY(){
 
 
 /*
+
+
+
+
+int joystick::datoX(){
+    cambioDatoX=adc_read(pinEjeX);
+    return cambioDatoX;
+}
+uint16_t joystick::datoZ(){
+    cambioDatoZ=adc_read(pinEjeZ);
+    return cambioDatoZ;
+}
+int joystick::datoY(){
+    cambioDatoY=adc_read(pinEjeY);
+    return cambioDatoY;
+}
+
+
+
+
 int main(){
     UART pantalla1;
     pantalla1.uart_init();

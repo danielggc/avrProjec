@@ -17,14 +17,14 @@ void adc_init()
     ADMUX = (1<<REFS0);
     ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 }
-u_int16_t adc_read(uint8_t ch){
+uint16_t adc_read(uint8_t ch){
   ch &= 0b00000111; 
   ADMUX = (ADMUX & 0xF8)|ch; 
   ADCSRA |= (1<<ADSC);
   while(ADCSRA & (1<<ADSC));
-  int const  lectura =(ADC);
+  int   lectura =(ADC);
   
-  return const;
+  return lectura;
 }
 
 

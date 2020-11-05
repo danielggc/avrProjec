@@ -29,9 +29,9 @@ class joystick{
         bool validarEstadoZ();
         int datoX();
         int datoY();
-        int datoZ();
+        uint16_t datoZ();
         int cambioDatoX;
-        int cambioDatoZ; 
+        uint16_t cambioDatoZ; 
         int cambioDatoY;
         int desplasamientoX;
         int desplasamientoZ; 

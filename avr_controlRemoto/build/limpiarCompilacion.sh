@@ -2,12 +2,12 @@
  
 if  test -e target $1; then
     mv *.o target
-	if test -e ../scr/main.hex $1; then 
-        rm ../scr/main.elf 
-        rm ../scr/main.hex
+	if test -e ../src/main.hex $1; then 
+        rm ../src/main.elf 
+        rm ../src/main.hex
     else 
-        if test ../scr/main.elf $1; then
-            rm ../scr/main.elf
+        if test ../src/main.elf $1; then
+            rm ../src/main.elf
         fi
     fi 
 	rm -rf target
@@ -15,12 +15,12 @@ if  test -e target $1; then
 else
     mkdir target
     mv *.o target
-	if test -e ../scr/main.hex $1; then 
-        rm ../scr/main.elf 
-        rm ../scr/main.hex
+	if test -e ../src/main.hex $1; then 
+        rm ../src/main.elf 
+        rm ../src/main.hex
     else 
-        if test ../scr/main.elf $1; then
-            rm ../scr/main.elf 
+        if test ../src/main.elf $1; then
+            rm ../src/main.elf 
         fi
     fi
 	rm -rf target
