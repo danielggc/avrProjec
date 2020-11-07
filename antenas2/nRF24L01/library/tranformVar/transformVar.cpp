@@ -54,7 +54,7 @@ int char_to_int(char *direccionCaracter){
 
 }
 
-int numeroUnidades(long _numero){
+int numeroUnidades(int _numero){
     long numero=_numero;  
     int contador=0;    
     if (numero==0){
@@ -69,7 +69,7 @@ int numeroUnidades(long _numero){
     }
     return contador;
 }
-int int_to_char(long _numero ,char* cadenaChar , int largo){
+int int_to_char(int _numero ,char* cadenaChar , int largo){
     UART pantalla1;
     int contador=0;    
     long numero=_numero;

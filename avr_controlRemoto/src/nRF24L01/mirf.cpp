@@ -100,19 +100,29 @@ uint8_t  Nrf24::nrf24_retransmissionCount(){
 }
 
 
+void Nrf24::nrf24_send(char* value) {    
+	mirf_CE_lo 
+    mirf_CSN_lo 
+    comunicacion.SPI_uint8_tTransmit(FLUSH_TX);         
+    mirf_CSN_hi;                    
+   	mirf_CSN_lo;    
+    uint8_t daniel[]={'1','2','3','4',' ','  ',' ',' ',' ',' ',' ',' ',' '};
+    comunicacion.SPI_uint8_tTransmit(W_TX_PAYLOAD);
+    nrf24_transmitSync(value,mirf_PAYLOAD);       
+    mirf_CSN_hi;
+  	mirf_CE_hi    
+}
 void Nrf24::nrf24_send(uint8_t* value) {    
 	mirf_CE_lo 
     mirf_CSN_lo 
     comunicacion.SPI_uint8_tTransmit(FLUSH_TX);         
     mirf_CSN_hi;                    
-   	mirf_CSN_lo;     
+   	mirf_CSN_lo;    
     comunicacion.SPI_uint8_tTransmit(W_TX_PAYLOAD);
     nrf24_transmitSync(value,mirf_PAYLOAD);       
     mirf_CSN_hi;
-
   	mirf_CE_hi    
 }
-
 uint8_t  Nrf24::nrf24_isSending(){
     uint8_t status;
 
@@ -188,6 +198,13 @@ void Nrf24::nrf24_transferSync(uint8_t* dataout,uint8_t* datain,uint8_t len){
 
 }
 
+void Nrf24::nrf24_transmitSync(char* dataout,uint8_t len){
+    uint8_t i;
+    for(i=0;i<len;i++){
+        comunicacion.SPI_char_tTransmit(dataout[i]);
+    }
+
+}
 void Nrf24::nrf24_transmitSync(uint8_t* dataout,uint8_t len){
     uint8_t i;
     for(i=0;i<len;i++){

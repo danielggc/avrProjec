@@ -31,50 +31,93 @@ uint16_t adc_read(uint8_t ch){
 PinConfiguration::PinConfiguration(char _portType){
     portType=_portType;
 }
-int PinConfiguration::Pind(unsigned int _pinRead){
+bool PinConfiguration::Pind(unsigned int _pinRead){
     unsigned int pinRead =_pinRead;    
     if(portType == 'B'){
         if(pinRead & pin7){
             if (~PINB & (1 << PORT7)){
-                return 1;
+                return true;
             }                
         }
         else if(pinRead & pin6){
             if (~PINB & (1 << PORT6)){
-                return 1;
+                return true;
             }                
         }
         else if(pinRead & pin5){
             if (~PINB & (1 << PORT5)){
-                return 1;
+                return true;
             }        
         }            
         else if(pinRead & pin4){
             if (~PINB & (1 << PORT4)){
-                return 1;
+                return true;
             }        
         }
         else if(pinRead & pin3){
             if (~PINB & (1 << PORT3)){
-                return 1;
+                return true;
             }                
         }        
         else if(pinRead & pin2){
             if (~PINB & (1 << PORT2)){
-                return 1;
+                return true;
             }        
         }        
         else if(pinRead & pin1){
             if (~PINB & (1 << PORT1)){
-                return 1;
+                return true;
             }                
         }
         else if(pinRead & pin0){
             if (~PINB & (1 << PORT0)){
-                return 1;
+                return true;
             }                
         }  
-        return 0;                  
+        return false;                  
+    }
+    if(portType == 'D'){
+        if(pinRead & pin7){
+            if (~PIND & (1 << PORT7)){
+                return true;
+            }                
+        }
+        else if(pinRead & pin6){
+            if (~PIND & (1 << PORT6)){
+                return true;
+            }                
+        }
+        else if(pinRead & pin5){
+            if (~PIND & (1 << PORT5)){
+                return true;
+            }        
+        }            
+        else if(pinRead & pin4){
+            if (~PIND & (1 << PORT4)){
+                return true;
+            }        
+        }
+        else if(pinRead & pin3){
+            if (~PIND & (1 << PORT3)){
+                return true;
+            }                
+        }        
+        else if(pinRead & pin2){
+            if (~PIND & (1 << PORT2)){
+                return true;
+            }        
+        }        
+        else if(pinRead & pin1){
+            if (~PIND & (1 << PORT1)){
+                return true;
+            }                
+        }
+        else if(pinRead & pin0){
+            if (~PIND & (1 << PORT0)){
+                return true;
+            }                
+        }  
+        return false;                  
     }
 }
 

@@ -34,6 +34,18 @@ uint8_t SPI::SPI_uint8_tTransmit(uint8_t message){
    flush_buffer=SPDR;
     return flush_buffer;
 }
+uint8_t SPI::SPI_char_tTransmit(char message){
+   UART pantalla1;
+   pantalla1.uart_init();
+   SPDR=message;
+   char flush_buffer;
+   int contador=0;
+   while((SPSR & (1<<SPIF))==0){
+  
+   };
+   flush_buffer=SPDR;
+    return flush_buffer;
+}
 
   void SPI::SPI_CaracterTransmit(char message){
    char flush_buffer;

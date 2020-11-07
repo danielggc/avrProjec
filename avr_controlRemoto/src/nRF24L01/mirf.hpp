@@ -46,6 +46,7 @@ class Nrf24{
         uint8_t nrf24_getStatus();
         uint8_t nrf24_rxFifoEmpty();
 
+        void    nrf24_send(char* value);
         void    nrf24_send(uint8_t* value);
         void    nrf24_getData(uint8_t* data);
 
@@ -62,6 +63,7 @@ class Nrf24{
 
         uint8_t spi_transfer(uint8_t tx);
         void    nrf24_transmitSync(uint8_t* dataout,uint8_t len);
+        void    nrf24_transmitSync(char* dataout,uint8_t len);
         void    nrf24_transferSync(uint8_t* dataout,uint8_t* datain,uint8_t len);
         void    nrf24_configRegister(uint8_t reg, uint8_t value);
         void    nrf24_readRegister(uint8_t reg, uint8_t* value, uint8_t len);

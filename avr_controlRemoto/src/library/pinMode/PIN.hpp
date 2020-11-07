@@ -31,7 +31,7 @@ class PinConfiguration{
     PinConfiguration(char);
     void pinMode(unsigned int) ;
     void diguitalWrite(unsigned int);
-    int Pind(unsigned int);
+    bool Pind(unsigned int);
 };
 void configAnalogPWM();
 void adc_init();

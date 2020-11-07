@@ -63,12 +63,12 @@ int main(){
         }
         temp = antenaRX.nrf24_retransmissionCount();
         DDRD |= (1<<PORTD2);
-    for(int d=0;d<7;d++){
-        _delay_ms(100);
-        PORTD &= ~(1<<PORTD2);
-        _delay_ms(100);
-        PORTD |= (1<<PORTD2);
-    }
+        for(int d=0;d<7;d++){
+            _delay_ms(100);
+            PORTD &= ~(1<<PORTD2);
+            _delay_ms(100);
+            PORTD |= (1<<PORTD2);
+        }
         _delay_ms(1000);
         antenaRX.nrf24_powerDown();
     }

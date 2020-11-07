@@ -68,10 +68,17 @@ bool joystick::validarEstadoY(){
 }
 
 
+pulsadorJoystinck0::pulsadorJoystinck0(){
+    PinConfiguration pulsadorPD4('D');
+    pulsadorPD4.pinMode(pin4|INTPUT);
+}
 
 
-
-
+bool pulsadorJoystinck0 ::pulsador1(){
+    PinConfiguration pulsadorPD4('D');
+    pulsadorPD4.pinMode(pin4|INTPUT);
+    return pulsadorPD4.Pind(pin4);
+}
 
 
 

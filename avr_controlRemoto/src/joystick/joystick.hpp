@@ -15,7 +15,7 @@
 
 #define pinEjeY 5
 #define pinEjeX 4
-#define pinEjeZ 2
+#define pinEjeZ 3
 #define A1 1
 #define A0 0
 
@@ -36,4 +36,18 @@ class joystick{
         int desplasamientoX;
         int desplasamientoZ; 
         int desplasamientoY;
+};
+
+
+class pulsadorJoystinck0{
+    private:
+        PinConfiguration pulsadorPD4();  
+    public:
+        pulsadorJoystinck0();
+        bool pulsador1();
+        bool pulsador2();
+};
+class pulsadorJoystinck1{
+    bool pulsador1();
+    bool pulsador2();
 };

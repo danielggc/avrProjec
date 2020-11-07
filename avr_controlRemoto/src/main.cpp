@@ -13,71 +13,58 @@
 #include "library/pinMode/PIN.hpp"
 #include "library/tranformVar/transformVar.hpp"
 #include "joystick/joystick.hpp"
+#include "codificadoControl/codificadoControl.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 using namespace std;
 
 int main(){ 
-    
+    uint8_t data_array[]={'1','2','3','4',' ','  ',' ',' ',' ',' ',' ',' ',' '};
+    uint8_t tx_address[5] = {0,0,0,0,1};
+    uint8_t rx_address[5] = {0,0,0,0,1};
     UART pantalla1;
     SPI iniciar;
-    joystick control;  
+    joystick control;
+    codificadoControl droneR2;
+    pulsadorJoystinck0 pulsador ;
     pantalla1.uart_init();
     adc_init();
     sei();
-    uint16_t datosZJoystick=0;    
-    iniciar.SPI_Init(Master);
+    uint16_t datosYJoystick=0;    
     uint16_t datosXJoystick=0;
-
-    int dato =52 ;
-    char buffer[33];
-    itoa(dato,buffer,10);
-    pantalla1.UART_write_txt(buffer);
-      while (1){
-        if(control.validarEstadoZ()){
+    while (1){
+        if(control.validarEstadoY()){
             control.validarEstadoX();
-            pantalla1.UART_write_txt("   Y:");
-            datosZJoystick=control.cambioDatoZ;
-            pantalla1.UART_WriteInt(datosZJoystick);
+            datosYJoystick=control.cambioDatoY;
             datosXJoystick =control.cambioDatoX;
-            pantalla1.UART_write_txt("   X:");
-            pantalla1.UART_WriteInt(datosXJoystick);
-            pantalla1.USART0SendByte('\n');
+            droneR2.codificadoEnvio(datosXJoystick,datosYJoystick,0,true);          
         }
+        _delay_ms(10);
     }
-    
-
 }
-
-
 
 
 
 /*
 
-      datosZJoystick=control.cambioDatoZ;
-            datosXJoystick =control.cambioDatoX;
-            pantalla1.UART_WriteInt(datosZJoystick);
-            pantalla1.USART0SendByte(' ');
-            _delay_ms(50);
-            pantalla1.UART_WriteInt(datosXJoystick);
-            pantalla1.USART0SendByte('\n');
-            _delay_ms(50);
 
-
-
-            pantalla1.UART_write_txt("   Y:");
-            datosZJoystick=control.cambioDatoZ;
-            datosXJoystick =control.cambioDatoX;
-            itoa(datosZJoystick,buffer,10);
-            pantalla1.UART_write_txt(buffer);
-            pantalla1.UART_write_txt("   X:");
-            _delay_ms(50);
+    if(control.validarEstadoY()){
             control.validarEstadoX();
-            itoa(datosXJoystick,buffer,10);
-            pantalla1.UART_write_txt(buffer);
+            pantalla1.UART_write_txt("   Y:");
+            datosYJoystick=control.cambioDatoY;
+            pantalla1.UART_WriteInt(datosYJoystick);
+            datosXJoystick =control.cambioDatoX;
+            pantalla1.UART_write_txt("   X:");
+            pantalla1.UART_WriteInt(datosXJoystick);
+            if(pulsador.pulsador1()==true){
+                pantalla1.UART_write_txt("      Pulsado");
+            }
+            else{
+                pantalla1.UART_write_txt("      Suelto");
+            }
             pantalla1.USART0SendByte('\n');
-            _delay_ms(50);
+        }
+
 
 */

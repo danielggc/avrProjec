@@ -41,6 +41,7 @@ class SPI{
       uint8_t SPI_received();
       void SPI_TextTransmit(char *);
       uint8_t SPI_uint8_tTransmit(uint8_t);
+      uint8_t SPI_char_tTransmit(char);
       unsigned char SPI_receivedChar();
 
 
