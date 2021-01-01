@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include "../328.hpp"
 #include <util/delay.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,10 +23,19 @@
 #define  pin0 1<<9
 #define USART_BAUDRATE 9600
 #define UBRR_VALUE  (((F_CPU / (USART_BAUDRATE * 16UL))) - 1)
+
+//spi 
+#define SPI_MOSI    PB2
+#define SPI_MISO    PB3
+#define SPI_SCK     PB1
+#define SPI_CS      PB0
+#define SPI_FREQ    8000 // 8 KHz
+
 class SPI{
     public:
       void SPI_Init(int);
-      void SPI_CaracterTransmit(char);  
+      void SPI_CaracterTransmit(char); 
+      uint8_t SPI_uint8_tTransmit(uint8_t);
       uint8_t SPI_received(uint8_t);
       void SPI_TextTransmit(char *);
 };

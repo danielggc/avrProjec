@@ -1,11 +1,12 @@
-DEVICE     = atmega2560
+DEVICE     = atmega328p
 CLOCK      = 8000000
-PROGRAMMER = usbasp
-PORT	   = /dev/ttyS0
-BAUD       = 19200
+PROGRAMMER = arduino
+PORT	   = /dev/ttyACM0
+BAUD       = 115200
 FILENAME   = main
 COMPILE    = avr-g++ -Wall  -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 libraryCommunication =./library/libraryCommunication
+nRF24=./nRF24L01/mirf
 SRC     := src
 OUT_DIR := target
 OBJ_DIR := obj
@@ -13,7 +14,7 @@ all:   build upload
 build:
 	$(COMPILE) -c  $(libraryCommunication).cpp
 	$(COMPILE) -c  $(FILENAME).cpp 
-	$(COMPILE) -o  $(FILENAME).elf $(FILENAME).o libraryCommunication.o
+	$(COMPILE) -o  $(FILENAME).elf $(FILENAME).o libraryCommunication.o 
 	avr-objcopy -j .text -j .data -O ihex $(FILENAME).elf $(FILENAME).hex
 	avr-size --format=avr --mcu=$(DEVICE) $(FILENAME).elf
 
