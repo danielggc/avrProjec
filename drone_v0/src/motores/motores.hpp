@@ -9,10 +9,14 @@
 class motores{
     public:
     void initMotores();
-    bool motorA(int);
-    bool motorB(int);
-    bool motorC(int);
-    bool motorD(int);
+    int motorA(int);
+    int motorB(int);
+    int motorC(int);
+    int motorD(int);
+    int motorA();
+    int motorB();
+    int motorC();
+    int motorD();
 
 };
 

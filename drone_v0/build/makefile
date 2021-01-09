@@ -13,9 +13,15 @@ nRF24	   =../src/nRF24L01/mirf
 Joystick = ../src/joystick/joystick
 codificadoControl= ../src/codificadoControl/codificadoControl
 motor = ../src/motores/motores
+balanceo = ../src/balanceo/balanceo
+I2C       = ../src/I2C/i2c
+MPU-6050  = ../src/MPU_6050/mpu-6050
 all:   build upload clean 
 build:
+	$(COMPILE) -c  $(balanceo).cpp
 	$(COMPILE) -c  $(motor).cpp
+	$(COMPILE) -c  $(I2C).cpp
+	$(COMPILE) -c  $(MPU-6050).cpp
 	$(COMPILE) -c  $(codificadoControl).cpp
 	$(COMPILE) -c  $(Joystick).cpp
 	$(COMPILE) -c  $(TRANFORM_VAR).cpp
@@ -24,7 +30,7 @@ build:
 	$(COMPILE) -c  $(UART).cpp
 	$(COMPILE) -c  $(PIN).cpp
 	$(COMPILE) -c  $(FILENAME).cpp 
-	$(COMPILE) -o  $(FILENAME).elf main.o PIN.o  UART.o spi.o mirf.o transformVar.o joystick.o codificadoControl.o motores.o
+	$(COMPILE) -o  $(FILENAME).elf main.o PIN.o  UART.o spi.o mirf.o transformVar.o joystick.o codificadoControl.o motores.o balanceo.o mpu-6050.o  i2c.o
 
 		
 	avr-objcopy -j .text -j .data -O ihex $(FILENAME).elf $(FILENAME).hex

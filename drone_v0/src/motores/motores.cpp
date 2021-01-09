@@ -2,11 +2,12 @@
 
 
 void motores::initMotores(){
-    PORTD |= (1<<PORTD5);
-    PORTD |= (1<<PORTD6);
+    DDRD |= (1<<PORTD5);
+    DDRD |= (1<<PORTD6);
     DDRB  |= ( 1<< PORTB1 ); 
     DDRB  |= ( 1<< PORTB2 ); 
     ICR1 = 0xFFFF;
+    
 
     TCCR0A |=  (1 << COM1A1) | (0 << COM1A0) ;
     TCCR0A |=  (0 << WGM11) | (1 << WGM10) ;
@@ -20,21 +21,37 @@ void motores::initMotores(){
     TCCR1A |=  (1 << COM1B1)| (0 << COM1B0);
 }
 
-bool motores::motorA(int velocidad){
+int motores::motorA(int velocidad){
     OCR1A=velocidad;
-    true;
+    return OCR1A;
 }
-bool motores::motorB(int velocidad){
+int motores::motorB(int velocidad){
     OCR1B=velocidad;
-    true;
+    return OCR1B;
 }
 
-bool motores::motorC(int velocidad){
+int motores::motorC(int velocidad){
     OCR0A=velocidad;
-    true;
+    return OCR1B;
 }
 
-bool motores::motorD(int velocidad){
+int motores::motorD(int velocidad){
     OCR0B=velocidad;
-    true;
+    return OCR1B;
+}
+
+
+int motores::motorA(){
+    return OCR1A;
+}
+int motores::motorB(){
+    return OCR1B;
+}
+
+int motores::motorC(){
+    return OCR1B;
+}
+
+int motores::motorD(){
+    return OCR1B;
 }

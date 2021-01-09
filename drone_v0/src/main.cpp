@@ -16,62 +16,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "motores/motores.hpp"
+#include "I2C/i2c.hpp"
+#include "MPU_6050/mpu-6050.hpp"
+#include <util/twi.h>
+#include "balanceo/balanceo.hpp"
 using namespace std;
+#define EEPROM_Write_Addess		0xA0
+#define EEPROM_Read_Addess		0xA1
+
 
 int main(){ 
-    DDRD |= (1<<PORTD2);
-    DDRD |= (1<<PORTD5);
-    DDRD |= (1<<PORTD6);
-    PORTD &= ~(1<<PORTD5);
-    PORTD &= ~(1<<PORTD6);
-    for(int d=0;d<7;d++){
-        _delay_ms(1000);
-        PORTD &= ~(1<<PORTD2);
-        _delay_ms(1000);
-        PORTD |= (1<<PORTD2);
-    }
-    DDRB |= ( 1<< PB1 ); 
-    DDRB |= ( 1<< PB2 ); 
-    ICR1 = 0xFFFF;
-    TCCR1A |=  (1 << COM1A1) | (0 << COM1A0) ; 
-    TCCR1A |=  (0 << WGM11) | (1 << WGM10) ;
-    TCCR1B |= (0 << CS12) | (1 << CS11) | ( 0 << CS10 );
-    TCCR1A |=  (1 << COM1B1)| (0 << COM1B0);
-    OCR1A=50;
-    OCR1B=50;
-
-
-
-    TCCR0A |=  (1 << COM1A1) | (0 << COM1A0) ;
-    TCCR0A |=  (0 << WGM11) | (1 << WGM10) ;
-    TCCR0B |=  (0 << CS12) | (1 << CS11) | ( 0 << CS10 );
-    TCCR0A |=  (1 << COM1B1)| (0 << COM1B0);
-
-    OCR0A=100;
-    OCR0B=50;
-
+    balanceo drone_v0;
+    motores motoresAB;
+    
+    UART pantalla1;
+    pantalla1.uart_init();
+    pantalla1.UART_write_txt(" que empieze lo bueno \n"); 
+    
+    while (1){
+        drone_v0.estabilisarDrone();
+        _delay_ms(1000);        
+   }
+    
 }
 
-
-
-
-
-
-
-
-
-
-
-/*
-      for(int d=0;d++;d<255){
-           OCR1A=d;
-           _delay_ms(100);
-       }
-       for(int d=255;d--;d>0){
-           OCR1A=d;
-           _delay_ms(100);
-       }
-       _delay_ms(10000);
- 
-*/

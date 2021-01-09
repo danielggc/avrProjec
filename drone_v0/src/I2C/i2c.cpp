@@ -1,138 +1,136 @@
 # include "i2c.hpp"
-#include <avr/iom2560.h>
 
-uint8_t I2c::rxBuffer[BUFFER_LENGTH];
-uint8_t I2c::rxBufferIndex = 0;
-uint8_t I2c::rxBufferLength = 0;
 
-uint8_t I2c::txAddress = 0;
-uint8_t I2c::txBuffer[BUFFER_LENGTH];
-uint8_t I2c::txBufferIndex = 0;
-uint8_t I2c::txBufferLength = 0;
+static volatile uint8_t busy;
+static struct {
+  uint8_t buffer[TWI_BUFFER_LENGTH];
+  uint8_t length;
+  uint8_t index;
+  void (*callback)(uint8_t, uint8_t *);
+} transmission;
 
-uint8_t I2c::transmitting = 0;
+void twi_init() {
+  TWBR = ((F_CPU / TWI_FREQ) - 16) / 2;
+  TWSR = 0; // prescaler = 1
 
-void I2c::iniciar(){
-    DDRD  = ((1<<TW_SCL_PIN)|(1<<TW_SDA_PIN));
-    PORTD = ((1<<TW_SCL_PIN)|(1<<TW_SDA_PIN));  
-	TWBR  = 2;                  
-	TWCR |= (1<<TWEN);         
+  busy = 0;
+
+  sei();
+
+  TWCR = _BV(TWEN);
 }
 
-void I2c::beginTransmission(uint8_t address)
-{
-    transmitting = 1;
-    txAddress = address;
-    txBufferIndex = 0;
-    txBufferLength = 0;
+uint8_t *twi_wait() {
+  while (busy);
+  return &transmission.buffer[1];
 }
 
-uint8_t I2c::endTransmission(uint8_t sendStop){
-    int8_t ret = twi_writeTo(txAddress, txBuffer, txBufferLength, sendStop);
-    txBufferIndex = 0;
-    txBufferLength = 0;
-    transmitting = 0;
-    return ret;
+void twi_start(void) {
+  TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
 }
 
-
-uint8_t twi_writeTo(uint8_t address, uint8_t* data, uint8_t length, uint8_t sendStop){
-    
-
-
+void twi_stop(void) {
+  TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWSTO);
 }
 
-uint8_t I2c::enviarDatos(unsigned char dato){
-    uint8_t status;
-    TWDR = dato;
-    TWDR = ((1<<TWINT)|(1<<TWEN));
-    espera();
-    status =estado();
-    if(status==0x28){
-        return 0;
+void twi_ack() {
+  TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
+}
+
+void twi_nack() {
+  TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE);
+}
+
+void twi_send(uint8_t data) {
+  TWDR = data;
+}
+
+void twi_recv() {
+  transmission.buffer[transmission.index++] = TWDR;
+}
+
+void twi_reply() {
+  if (transmission.index < (transmission.length - 1)) {
+    twi_ack();
+  } else {
+    twi_nack();
+  }
+}
+
+void twi_done() {
+  uint8_t address = transmission.buffer[0] >> 1;
+  uint8_t *data = &transmission.buffer[1];
+
+  busy = 0;
+
+  if (transmission.callback != NULL) {
+    transmission.callback(address, data);
+  }
+}
+
+void twi_write(uint8_t address, uint8_t* data, uint8_t length, void (*callback)(uint8_t, uint8_t *)) {
+  twi_wait();
+
+  busy = 1;
+
+  transmission.buffer[0] = (address << 1) | TW_WRITE;
+  transmission.length = length + 1;
+  transmission.index = 0;
+  transmission.callback = callback;
+  memcpy(&transmission.buffer[1], data, length);
+
+  twi_start();
+}
+
+void twi_read(uint8_t address, uint8_t length, void (*callback)(uint8_t, uint8_t *)) {
+  twi_wait();
+
+  busy = 1;
+
+  transmission.buffer[0] = (address << 1) | TW_READ;
+  transmission.length = length + 1;
+  transmission.index = 0;
+  transmission.callback = callback;
+
+  twi_start();
+}
+
+ISR(TWI_vect) {
+  switch (TW_STATUS) {
+  case TW_START:
+  case TW_REP_START:
+  case TW_MT_SLA_ACK:
+  case TW_MT_DATA_ACK:
+    if (transmission.index < transmission.length) {
+      twi_send(transmission.buffer[transmission.index++]);
+      twi_nack();
+    } else {
+      twi_stop();
+      twi_done();
     }
-    else if(status==0x30){
-        return 1;
-    }
-    else return 2;
-}
+    break;
 
-uint8_t I2c::I2C_Start(unsigned char address) {
-    uint8_t status;
-    TWCR=(1<<TWSTA)|(1<<TWEN)|(1<<TWINT);
-    espera();
-    status=estado();
-    if(status!=0x08){
-        return 0;
-    }
-    TWDR = address;
-    TWCR=(1<<TWEN)|(1<<TWINT);
-    espera();
-    status = estado();
-    if(status==0x18){
-        return 1;
-    }
-    else if (status==0x20){
-        return 2;
-    }
-    return 3;
-    
-}
-uint8_t I2c::I2C_Repeated_Start(unsigned char address) {
-    uint8_t status;
-    TWCR=(1<<TWSTA)|(1<<TWEN)|(1<<TWINT);
-    espera();
-    status=estado();
-    if(status!=0x08){
-        return 0;
-    }
-    TWDR = address;
-    TWCR=(1<<TWEN)|(1<<TWINT);
-    espera();
-    status = estado();
-    if(status==0x40){
-        return 1;
-    }
-    else if (status==0x48){
-        return 2;
-    }
-    return 3;
-    
-}
+  case TW_MR_DATA_ACK:
+    twi_recv();
+    twi_reply();
+    break;
 
-void I2c::I2C_Stop(){
-    TWCR=(1<<TWSTO)|(1<<TWINT)|(1<<TWEN);
-    while(TWCR&(1<<TWSTO));	
+  case TW_MR_SLA_ACK:
+    twi_reply();
+    break;
+
+  case TW_MR_DATA_NACK:
+    twi_recv();
+    twi_stop();
+    twi_done();
+    break;
+
+  case TW_MT_SLA_NACK:
+  case TW_MR_SLA_NACK:
+  case TW_MT_DATA_NACK:
+  default:
+    twi_stop();
+    twi_done();
+    break;
+  }
 }
-
-
-
-
-void I2c::setAddress(uint8_t address){
-    TWAR=(address<<1);
-}
-void I2c::espera(){
-    while((TWCR & (1<<TWINT))==0);
-}
-void I2c::iniciarComunicacion(){
-    TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
-    espera();
-}
-
-unsigned char I2c::recibirDatos_ACK(){
-	TWCR = (1<<TWINT)|(1<<TWEN)|(1<<TWEA);
-	espera();
-	return TWDR;
-}
-
-unsigned char  I2c::recibirDatos_nACK(){
-    TWCR = (1<<TWINT)|(1<<TWEN);
-    espera();
-	return TWDR;
-}
-uint8_t I2c::estado(){
-    uint8_t estadoI2c=TWSR&0xF8;
-    return estadoI2c;
-}
-
-

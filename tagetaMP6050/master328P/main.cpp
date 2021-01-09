@@ -30,8 +30,9 @@ int main(){
 		mpu__6050.update();
 		int gyroX=mpu__6050.getGyroX();
 		int accX= mpu__6050.getRawAccX();
-		pantalla1.UART_write_txt("\naceleracion\n");
-		pantalla1.UART_WriteInt(accX);
+		int angle = mpu__6050.getRawGyroX();
+		pantalla1.UART_write_txt("\nangulo\n");
+		pantalla1.UART_WriteInt(gyroX);
 		_delay_ms(1000);
 	}
     

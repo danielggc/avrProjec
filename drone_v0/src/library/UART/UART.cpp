@@ -33,10 +33,27 @@ uint8_t UART::USART0ReceiveByte(){
 }
 
 
-void UART::UART_WriteInt(int numero){
-    int largo=numeroUnidades(numero);
-    char buffer[largo+20];
-    itoa(numero,buffer,10);
+void UART::UART_WriteInt(long numero){
+    long largo=numeroUnidades(numero);
+    char buffer[largo+5];
+    if(largo==6 || largo >6){
+        itoa(numero,buffer,10);
+        int respaldo=largo;
+        UART_write_txt("*");
+        do{
+            numero=numero/10;
+            largo=largo-1;
+        }while(largo>5);
+        for(int i=0;i<respaldo;i++){
+            if(largo==i){
+                buffer[i]='0';
+            }
+        }
+    }
+    else{
+        itoa(numero,buffer,10);
+    }
+    
+   
     UART_write_txt(buffer);
-
 }

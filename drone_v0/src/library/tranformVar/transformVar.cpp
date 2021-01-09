@@ -54,20 +54,23 @@ int char_to_int(char *direccionCaracter){
 
 }
 
-int numeroUnidades(int _numero){
+long numeroUnidades(long _numero){
     long numero=_numero;  
     int contador=0;    
     if (numero==0){
         return 1;
-    }else if(numero<0){
-        numero=numero*-1;
-        contador++;
     }
-    while (numero>0){
-        numero=numero/10;
-        contador++;
+    else{
+        if(numero<0){
+            numero=numero*-1;
+            contador++;
+        }
+        while (numero>0){
+            numero=numero/10;
+            contador++;
+        }
+        return contador++;
     }
-    return contador++;
 }
 void int_to_char(int _numero ,char* cadenaChar , int largo){
     UART pantalla1;

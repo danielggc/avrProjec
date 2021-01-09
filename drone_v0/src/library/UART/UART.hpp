@@ -15,7 +15,7 @@ class UART{
         uint8_t USART0ReceiveByte();
         void UART_write_txt(char *);
         void USART_Uint8_tWrite(uint8_t);
-        void UART_WriteInt(int);
+        void UART_WriteInt(long);
     private:
          
 };
