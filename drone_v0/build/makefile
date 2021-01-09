@@ -33,7 +33,7 @@ build:
 	$(COMPILE) -c  $(UART).cpp
 	$(COMPILE) -c  $(PIN).cpp
 	$(COMPILE) -c  $(FILENAME).cpp 
-	$(COMPILE) -o  $(FILENAME).elf main.o PIN.o  UART.o spi.o mirf.o transformVar.o joystick.o codificadoControl.o motores.o balanceo.o mpu-6050.o  i2c.o
+	$(COMPILE) -o  $(FILENAME).elf main.o PIN.o  UART.o spi.o mirf.o transformVar.o joystick.o codificadoControl.o motores.o balanceo.o mpu-6050.o  i2c.o pid.o
 
 		
 	avr-objcopy -j .text -j .data -O ihex $(FILENAME).elf $(FILENAME).hex

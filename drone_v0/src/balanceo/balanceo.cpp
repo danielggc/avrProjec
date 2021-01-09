@@ -74,91 +74,59 @@ bool  i2cCorte::validarEstadoY(){
         return false;
     }
 }
+
+
+
+
 balanceo::balanceo(){
-     i2cCorte mpu();
-     motores drone();
+    struct PidData pid;
+    i2cCorte mpu();
+    motores drone();
+    pidInit(Kp,KI,KD,&pid);
 }
 
-bool balanceo::masX(int c){
+bool balanceo::estabilizarEjeX(){
     mpu.mpu__6050.update();
     estadoX = mpu.mpu__6050.getRawAccX();
     const int estadoActualA = drone.motorA();
     const int estadoActualB = drone.motorB();
-    mpu.pantalla1.UART_write_txt("que vamos mas X =)");
-    int Ma = estadoActualA;
-    int Mb = estadoActualB;   
-    while (estadoX > 50 ){
+    while (estadoX > 50 || estadoX < 50){
         mpu.mpu__6050.update();
         estadoX=mpu.mpu__6050.getRawAccX();
-        mpu.pantalla1.UART_WriteInt(drone.motorA(Ma));
-        mpu.pantalla1.UART_write_txt("\n");
-        if(drone.motorA() < 2){
-            estadoX = 1;
+        int correccion =255*(pidController(0,estadoX,&pid))/MAX_INT;   
+        if(estadoX>0){
+            drone.motorA(-1*correccion);
+            drone.motorB(correccion/2);
+        }else if(estadoX>0){
+            drone.motorA(-1*correccion/2);
+            drone.motorB(correccion);
         }
-        _delay_ms(500);        
-        Ma= Ma - 2;
-        Mb= Mb + 2;
+        _delay_ms(10);    
         
     }
+    pidResetIntegral(&pid);
     return true;
 }
-bool balanceo::menosX(int c){
-    mpu.mpu__6050.update();
-    estadoX = mpu.mpu__6050.getRawAccX();
-    const int estadoActualA =drone.motorA();
-    const int estadoActualB =drone.motorB();
-    mpu.pantalla1.UART_write_txt("que vamos menos X =)");
-    int Ma = estadoActualA;
-    int Mb = estadoActualB;   
-    while (estadoX<0 ){
-        mpu.mpu__6050.update();
-        estadoX = mpu.mpu__6050.getRawAccX();
-        mpu.pantalla1.UART_WriteInt(drone.motorA(Ma));
-        mpu.pantalla1.UART_write_txt("\n");
-        if(drone.motorA()>255){
-            estadoX = 1;
-        }
-        _delay_ms(500);        
-        Ma = Ma + 2;
-        Mb = Mb - 2;
-        
-    }
-    return true;
-    
-}
+
 bool balanceo::restaurarAltura(int X,int Y){
     
 }
-bool balanceo::masY(int){
 
-}
-bool balanceo::menosY(int){
-
-}
-bool balanceo::validarEstadoAngular(){
-    if(mpu.validarEstadoX()){
-        cambioestadoX =mpu.cambioDatoX;
-    }
-    if(mpu.validarEstadoY()){
-        cambioestadoY =mpu.cambioDatoY;
-    }    
-}
 
 bool balanceo::estabilisarDrone(){
-    validarEstadoAngular();
-    if(cambioestadoX>700){
-        masX(cambioestadoX);
+    cambioestadoX =mpu.cambioDatoX;
+    cambioestadoY =mpu.cambioDatoY;
+    mpu.pantalla1.UART_write_txt(" ||||");
+    mpu.pantalla1.UART_WriteInt(cambioestadoX);
+    mpu.pantalla1.UART_write_txt(" ||||");
+    if(cambioestadoX>700 || cambioestadoX<-700){
+        estabilizarEjeX();
     }
-    if(cambioestadoX<-700){
-        menosX(cambioestadoX);
-    }
+   
     if(cambioestadoY>700){
         //masY(cambioestadoY);
     }
-    if(cambioestadoY<-700){
-        //menosY(cambioestadoY);
-    }
-        _delay_ms(5000);        
+    _delay_ms(5000);        
 
 }
 

@@ -16,6 +16,11 @@
 #include "../MPU_6050/mpu-6050.hpp"
 #include <util/twi.h>
 #include "../motores/motores.hpp"
+#include "../PID/pid.hpp"
+
+#define Kp 1
+#define KI 1
+#define KD 1
 #define EEPROM_Write_Addess		0xA0
 #define EEPROM_Read_Addess		0xA1
 
@@ -52,6 +57,7 @@ class balanceo{
     public:
         motores drone;
         i2cCorte mpu;
+        struct PidData pid;
         balanceo();
         bool validarEstadoAngular();
         int estadoX;
@@ -60,10 +66,8 @@ class balanceo{
         int cambioestadoY;
         int estadoZ;
         bool estabilisarDrone();
-        bool masY(int);
-        bool menosY(int);
-        bool masX(int);
-        bool menosX(int);
+        bool estabilizarEjeY();
+        bool estabilizarEjeX();
         bool restaurarAltura(int,int);
         
 

@@ -27,16 +27,20 @@ using namespace std;
 
 
 int main(){ 
-    balanceo drone_v0;
-    motores motoresAB;
-    
+    balanceo drone_v0;    
     UART pantalla1;
+    motores motoresABCD;
     pantalla1.uart_init();
     pantalla1.UART_write_txt(" que empieze lo bueno \n"); 
-    
+    motoresABCD.motorA(30);
+    motoresABCD.motorB(30);
+    motoresABCD.motorC(30);
+    motoresABCD.motorD(30);
     while (1){
         drone_v0.estabilisarDrone();
-        _delay_ms(1000);        
+        _delay_ms(500);       
+        pantalla1.UART_WriteInt(motoresABCD.motorA());
+        pantalla1.UART_write_txt("\n");
    }
     
 }
