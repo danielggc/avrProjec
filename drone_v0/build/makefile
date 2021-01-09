@@ -16,8 +16,11 @@ motor = ../src/motores/motores
 balanceo = ../src/balanceo/balanceo
 I2C       = ../src/I2C/i2c
 MPU-6050  = ../src/MPU_6050/mpu-6050
+PID 	  = ../src/PID/pid
+
 all:   build upload clean 
 build:
+	$(COMPILE) -c  $(PID).cpp
 	$(COMPILE) -c  $(balanceo).cpp
 	$(COMPILE) -c  $(motor).cpp
 	$(COMPILE) -c  $(I2C).cpp
