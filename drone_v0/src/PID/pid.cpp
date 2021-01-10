@@ -38,12 +38,12 @@ int16_t pidController(int16_t setPoint,int16_t processvalu,struct PidData *pid){
     d_term = (pid -> KI *(pid ->lastProcessValue -processvalu));
     pid -> lastProcessValue = processvalu;
     
-    ret = (p_term + i_term + d_term )/SCALING_FACTOR;
+    ret = (p_term + i_term + d_term );
     
     if(ret > MAX_INT)ret =MAX_INT;
     else if(ret < MAX_INT*-1);
     
-    return((int16_t)ret);
+    return(ret);
 }
 
 

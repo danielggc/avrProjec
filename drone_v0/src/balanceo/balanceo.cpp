@@ -81,29 +81,28 @@ bool  i2cCorte::validarEstadoY(){
 balanceo::balanceo(){
     struct PidData pid;
     i2cCorte mpu();
-    motores drone();
-    pidInit(Kp,KI,KD,&pid);
-}
+    motores drone();}
 
 bool balanceo::estabilizarEjeX(){
     mpu.mpu__6050.update();
     estadoX = mpu.mpu__6050.getRawAccX();
     const int estadoActualA = drone.motorA();
     const int estadoActualB = drone.motorB();
-    while (estadoX > 50 || estadoX < 50){
+    float nuevoEstadoB=estadoActualB;
+    float nuevoEstadoA=estadoActualA;
+    while (estadoX > 700 || estadoX < -700){
         mpu.mpu__6050.update();
         estadoX=mpu.mpu__6050.getRawAccX();
-        int correccion =255*(pidController(0,estadoX,&pid))/MAX_INT;   
-        if(estadoX>0){
-            drone.motorA(-1*correccion);
-            drone.motorB(correccion/2);
-        }else if(estadoX>0){
-            drone.motorA(-1*correccion/2);
-            drone.motorB(correccion);
-        }
-        _delay_ms(10);    
+        float correccion =(pidController(0,estadoX/100,&pid));
+        mpu.pantalla1.UART_write_txt(" ||||");
+        mpu.pantalla1.UART_WriteInt(correccion);
+        mpu.pantalla1.UART_write_txt(" ||||\n");
+
+      
+        _delay_ms(500);    
         
     }
+
     pidResetIntegral(&pid);
     return true;
 }
@@ -114,11 +113,10 @@ bool balanceo::restaurarAltura(int X,int Y){
 
 
 bool balanceo::estabilisarDrone(){
-    cambioestadoX =mpu.cambioDatoX;
-    cambioestadoY =mpu.cambioDatoY;
-    mpu.pantalla1.UART_write_txt(" ||||");
-    mpu.pantalla1.UART_WriteInt(cambioestadoX);
-    mpu.pantalla1.UART_write_txt(" ||||");
+    pidInit(Kp,KI,KD,&pid);
+    mpu.mpu__6050.update();
+    cambioestadoX = mpu.mpu__6050.getRawAccX();
+    cambioestadoY = mpu.mpu__6050.getRawAccX();
     if(cambioestadoX>700 || cambioestadoX<-700){
         estabilizarEjeX();
     }

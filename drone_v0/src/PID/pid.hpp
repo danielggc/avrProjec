@@ -8,8 +8,11 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include "stdint.h"
-#define MAX_INT         0x7ffffff 
-#define MAX_LONG        0x7ffffffffL 
+//   0x7ffffff      
+//    0x7ffffffffL 
+#define MAX_INT  10000
+#define MAX_LONG 100000   
+
 #define MAX_I_TERM      (MAX_LONG / 2) 
 #define FALSE           0 
 #define TRUE            1 
