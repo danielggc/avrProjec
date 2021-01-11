@@ -86,20 +86,58 @@ balanceo::balanceo(){
 bool balanceo::estabilizarEjeX(){
     mpu.mpu__6050.update();
     estadoX = mpu.mpu__6050.getRawAccX();
-    const int estadoActualA = drone.motorA();
-    const int estadoActualB = drone.motorB();
-    float nuevoEstadoB=estadoActualB;
-    float nuevoEstadoA=estadoActualA;
-    while (estadoX > 700 || estadoX < -700){
+    float nuevoEstadoB = drone.motorA();
+    float nuevoEstadoA =  drone.motorB();
+    const float estadoA = nuevoEstadoA;
+    const float estadoB = nuevoEstadoB;
+    while (estadoX > 50 || estadoX < -50){
         mpu.mpu__6050.update();
-        estadoX=mpu.mpu__6050.getRawAccX();
-        float correccion =(pidController(0,estadoX/100,&pid));
-        mpu.pantalla1.UART_write_txt(" ||||");
-        mpu.pantalla1.UART_WriteInt(correccion);
-        mpu.pantalla1.UART_write_txt(" ||||\n");
+        estadoX = mpu.mpu__6050.getRawAccX();
+        float correccion = ((pidController(0,estadoX/100,&pid)));
+        float correccionMotor = (correccion/10000)*255;
+        mpu.pantalla1.UART_WriteInt(nuevoEstadoA);
+        mpu.pantalla1.UART_write_txt("\n\n\n\n");
+        
+        if(estadoX>0){
+            nuevoEstadoA = ((estadoA +(-1*correccionMotor)));
+            nuevoEstadoB = ((estadoB +(correccionMotor/2)));
+            if(nuevoEstadoA == 255 || nuevoEstadoA > 255 ){
+                nuevoEstadoA=drone.motorA(255);
+            }else if(nuevoEstadoA == 0 || nuevoEstadoA <0){
+                nuevoEstadoA=drone.motorA(0);
+            }else{
+                nuevoEstadoA=drone.motorA(nuevoEstadoA);
+            }
+            if(nuevoEstadoB == 255 || nuevoEstadoB > 255 ){
+                nuevoEstadoB = drone.motorA(255);
+            }else if(nuevoEstadoB == 0 || nuevoEstadoB <0){
+                nuevoEstadoB = drone.motorA(0);
+            }else{
+                nuevoEstadoB = drone.motorB(nuevoEstadoB);
+            }
 
-      
-        _delay_ms(500);    
+        }
+        if(estadoX<0){
+            nuevoEstadoA = ((nuevoEstadoA +(-1*correccionMotor/2)));
+            nuevoEstadoB = ((nuevoEstadoB +(correccionMotor)));
+            if(nuevoEstadoA == 255 || nuevoEstadoA > 255 ){
+                nuevoEstadoA=drone.motorA(255);
+            }else if(nuevoEstadoA == 0 || nuevoEstadoA <0){
+                nuevoEstadoA=drone.motorA(0);
+            }else{
+                nuevoEstadoA=drone.motorA(nuevoEstadoA);
+            }
+            if(nuevoEstadoB == 255 || nuevoEstadoB > 255 ){
+                nuevoEstadoB = drone.motorA(255);
+            }else if(nuevoEstadoB == 0 || nuevoEstadoB <0){
+                nuevoEstadoB = drone.motorA(0);
+            }else{
+                nuevoEstadoB = drone.motorB(nuevoEstadoB);
+            }
+
+        }
+        
+        _delay_ms(800);    
         
     }
 

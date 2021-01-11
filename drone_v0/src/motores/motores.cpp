@@ -21,21 +21,21 @@ void motores::initMotores(){
     TCCR1A |=  (1 << COM1B1)| (0 << COM1B0);
 }
 
-int motores::motorA(int velocidad){
+float motores::motorA(float velocidad){
     OCR1A=velocidad;
     return OCR1A;
 }
-int motores::motorB(int velocidad){
+float motores::motorB(float velocidad){
     OCR1B=velocidad;
     return OCR1B;
 }
 
-int motores::motorC(int velocidad){
+float motores::motorC(float velocidad){
     OCR0A=velocidad;
     return OCR1B;
 }
 
-int motores::motorD(int velocidad){
+float motores::motorD(float velocidad){
     OCR0B=velocidad;
     return OCR1B;
 }
