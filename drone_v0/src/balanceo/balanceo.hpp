@@ -55,10 +55,12 @@ class i2cCorte{
 
 class balanceo{
     public:
+       
+        balanceo();
         motores drone;
         i2cCorte mpu;
-        struct PidData pid;
-        balanceo();
+        struct PidData pidA;
+        struct PidData pidB;
         bool validarEstadoAngular();
         int estadoX;
         int estadoY;
@@ -69,7 +71,9 @@ class balanceo{
         bool estabilizarEjeY();
         bool estabilizarEjeX();
         bool restaurarAltura(int,int);
-        
-
+        float convercion510(float);
+        float convercion255(float);
+        bool motorA(float,float);
+        bool motorB(float,float);
 
 };

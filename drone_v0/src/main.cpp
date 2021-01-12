@@ -32,16 +32,18 @@ int main(){
     motores motoresABCD;
     pantalla1.uart_init();
     pantalla1.UART_write_txt(" que empieze lo bueno \n"); 
-    motoresABCD.motorA(30);
-    motoresABCD.motorB(30);
-    motoresABCD.motorC(30);
-    motoresABCD.motorD(30);
+    motoresABCD.initMotores();
+    motoresABCD.motorA(0);
+    motoresABCD.motorB(0);
+    motoresABCD.motorC(10);
+    motoresABCD.motorD(10);
     while (1){
         drone_v0.estabilisarDrone();
-        _delay_ms(500);       
-        pantalla1.UART_WriteInt(motoresABCD.motorA());
-        pantalla1.UART_write_txt("\n");
-   }
+        _delay_ms(500);
+    }
+    
+  
+    
     
 }
 

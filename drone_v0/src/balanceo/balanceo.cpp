@@ -5,9 +5,11 @@
 
 
 i2cCorte:: i2cCorte(){
-    pantalla1.uart_init();
-    mpu__6050.begin();
+    UART pantalla1;
+    MPU6050 mpu__6050;
     twi_init();
+    pantalla1.uart_init();
+    
     cambioDatoX =0;
     cambioDatoZ =0 ;
     cambioDatoY =0;
@@ -80,69 +82,103 @@ bool  i2cCorte::validarEstadoY(){
 
 balanceo::balanceo(){
     struct PidData pid;
-    i2cCorte mpu();
-    motores drone();}
+    i2cCorte mpu;
+    motores drone;
+
+    
+    }
+              //nuevoEstadoA = ((estadoA +(-1*correccionMotores)));
+            //nuevoEstadoB = ((estadoB +(correccionMotores/1)));
+              //nuevoEstadoA = ((nuevoEstadoA +(-1*correccionMotores/1)));
+            //nuevoEstadoB = ((nuevoEstadoB +(correccionMotores)));
+
+float balanceo::convercion510(float dato){
+    float convertido=0.0;
+    if(dato == 127.5){
+        convertido = 0.0;
+    }else {
+        convertido =dato * 2;
+    }
+    return(convertido);
+}
+float balanceo::convercion255(float dato){
+    float convertido=0.0;
+    if(dato == 255){
+        convertido = 510;
+    }else if(dato == -255){
+        convertido = 0;
+    }
+    else if(dato == 0){
+        convertido = 255; 
+    }else if( dato > 0 ){
+        convertido = dato +255;
+    }else{
+
+        convertido =(255) + dato;
+    }
+    return(convertido);
+}
+
 
 bool balanceo::estabilizarEjeX(){
     mpu.mpu__6050.update();
     estadoX = mpu.mpu__6050.getRawAccX();
-    float nuevoEstadoB = drone.motorA();
-    float nuevoEstadoA =  drone.motorB();
-    const float estadoA = nuevoEstadoA;
-    const float estadoB = nuevoEstadoB;
-    while (estadoX > 50 || estadoX < -50){
+    const float estadoA = drone.motorA();
+    const float estadoB = drone.motorB();
+    pidA.sumError=estadoA;
+    pidB.sumError=estadoB;
+    while (estadoX > 200 || estadoX < -200){
         mpu.mpu__6050.update();
         estadoX = mpu.mpu__6050.getRawAccX();
-        float correccion = ((pidController(0,estadoX/100,&pid)));
-        float correccionMotor = (correccion/10000)*255;
-        mpu.pantalla1.UART_WriteInt(nuevoEstadoA);
-        mpu.pantalla1.UART_write_txt("\n\n\n\n");
-        
-        if(estadoX>0){
-            nuevoEstadoA = ((estadoA +(-1*correccionMotor)));
-            nuevoEstadoB = ((estadoB +(correccionMotor/2)));
-            if(nuevoEstadoA == 255 || nuevoEstadoA > 255 ){
-                nuevoEstadoA=drone.motorA(255);
-            }else if(nuevoEstadoA == 0 || nuevoEstadoA <0){
-                nuevoEstadoA=drone.motorA(0);
-            }else{
-                nuevoEstadoA=drone.motorA(nuevoEstadoA);
-            }
-            if(nuevoEstadoB == 255 || nuevoEstadoB > 255 ){
-                nuevoEstadoB = drone.motorA(255);
-            }else if(nuevoEstadoB == 0 || nuevoEstadoB <0){
-                nuevoEstadoB = drone.motorA(0);
-            }else{
-                nuevoEstadoB = drone.motorB(nuevoEstadoB);
-            }
-
-        }
-        if(estadoX<0){
-            nuevoEstadoA = ((nuevoEstadoA +(-1*correccionMotor/2)));
-            nuevoEstadoB = ((nuevoEstadoB +(correccionMotor)));
-            if(nuevoEstadoA == 255 || nuevoEstadoA > 255 ){
-                nuevoEstadoA=drone.motorA(255);
-            }else if(nuevoEstadoA == 0 || nuevoEstadoA <0){
-                nuevoEstadoA=drone.motorA(0);
-            }else{
-                nuevoEstadoA=drone.motorA(nuevoEstadoA);
-            }
-            if(nuevoEstadoB == 255 || nuevoEstadoB > 255 ){
-                nuevoEstadoB = drone.motorA(255);
-            }else if(nuevoEstadoB == 0 || nuevoEstadoB <0){
-                nuevoEstadoB = drone.motorA(0);
-            }else{
-                nuevoEstadoB = drone.motorB(nuevoEstadoB);
-            }
-
-        }
-        
-        _delay_ms(800);    
+        motorA(estadoX,estadoA);
+        mpu.mpu__6050.update();
+        estadoX = mpu.mpu__6050.getRawAccX();
+        motorB(estadoX,estadoB);
         
     }
 
-    pidResetIntegral(&pid);
+    pidResetIntegral(&pidA);
+    pidResetIntegral(&pidB);
     return true;
+}
+
+bool balanceo::motorA(float estadoXA ,float estadoA ){
+        float nuevoEstadoA =  drone.motorA();
+        float correccion = ((pidController(0,estadoXA/100,&pidA)));
+        float correccionMotores = (correccion/10000)*255;
+        float correccionMotorA = ((convercion510(estadoA)+convercion255(correccionMotores))/(510+convercion510(estadoA)))*510;
+        //mpu.pantalla1.UART_write_txt("\nA");
+        //mpu.pantalla1.UART_WriteInt(nuevoEstadoA);
+        if(estadoXA<0 || estadoXA > 0){
+            float correccionA = correccionMotorA/2;
+            nuevoEstadoA =  correccionA;
+            if(nuevoEstadoA == 255 || nuevoEstadoA > 255 ){
+                nuevoEstadoA=drone.motorA(255);
+            }else if(nuevoEstadoA == 0 || nuevoEstadoA <0){
+                nuevoEstadoA=drone.motorA(0);
+            }else{
+                nuevoEstadoA=drone.motorA(nuevoEstadoA);
+            }
+        }
+        return true;
+}
+bool balanceo::motorB(float estadoXB ,float estadoB){
+        float nuevoEstadoB = drone.motorB();
+        float correccion = (pidController(0,(estadoXB*-1)/100,&pidB));
+        float correccionMotores = (correccion/10000)*255;
+        float correccionMotorB = ((convercion510(estadoB)+convercion255(correccionMotores))/(510+convercion510(estadoB)))*510;
+        if(estadoXB<0 || estadoXB > 0){
+            float correccionB = correccionMotorB/2;
+            nuevoEstadoB =  correccionB;
+            if(nuevoEstadoB == 255 || nuevoEstadoB > 255 ){
+                nuevoEstadoB=drone.motorB(255);
+            }else if(nuevoEstadoB == 0 || nuevoEstadoB <0){
+                nuevoEstadoB=drone.motorB(0);
+            }else{
+                nuevoEstadoB=drone.motorB(nuevoEstadoB);
+            }
+        }
+        return true;
 }
 
 bool balanceo::restaurarAltura(int X,int Y){
@@ -151,7 +187,9 @@ bool balanceo::restaurarAltura(int X,int Y){
 
 
 bool balanceo::estabilisarDrone(){
-    pidInit(Kp,KI,KD,&pid);
+    mpu.mpu__6050.begin();
+    pidInit(Kp,KI,KD,&pidA);
+    pidInit(Kp,KI,KD,&pidB);
     mpu.mpu__6050.update();
     cambioestadoX = mpu.mpu__6050.getRawAccX();
     cambioestadoY = mpu.mpu__6050.getRawAccX();
